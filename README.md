@@ -1,5 +1,6 @@
 # CloudTamer
-A reusable Terraform boilerplate for provisioning infrastructure on AWS, Azure, and GCP with built-in support for multi-cloud deployments.  
+A Terraform boilerplate for provisioning infrastructure on AWS, Azure and GCP.  
+It offers built-in support for multi-cloud deployments.
 
 ## Get started
 Change working directory to your desired project:
