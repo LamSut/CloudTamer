@@ -9,7 +9,7 @@ variable "peer_region" {
 
 
 ###########################
-### EC2 Instances Coumt ###
+### EC2 Instances Count ###
 ###########################
 
 variable "amazon_count" {

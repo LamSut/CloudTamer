@@ -63,8 +63,4 @@ resource "aws_db_instance" "mysql" {
   backup_window           = "18:00-19:00"
 }
 
-output "mysql_endpoint" {
-  value = split(":", aws_db_instance.mysql.endpoint)[0]
-}
-
 

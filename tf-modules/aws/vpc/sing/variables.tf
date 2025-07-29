@@ -8,6 +8,8 @@ variable "vpc_cidr" {
   default = "10.0.0.0/16"
 }
 
+variable "vpc_dst_cidr" {}
+
 variable "public_subnet_1_cidr" {
   type    = string
   default = "10.0.1.0/24"

@@ -172,6 +172,13 @@ resource "aws_security_group" "usa_sg_rds_ec2" {
     security_groups = [aws_security_group.usa_sg_ssh.id, aws_security_group.usa_sg_rdp.id]
   }
 
+  ingress {
+    from_port   = 3306
+    to_port     = 3306
+    protocol    = "tcp"
+    cidr_blocks = [var.vpc_dst_cidr]
+  }
+
   egress {
     from_port   = 0
     to_port     = 0
