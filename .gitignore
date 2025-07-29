@@ -38,5 +38,8 @@ override.tf.json
 .terraformrc
 terraform.rc
 
+# Ignore Terraform provider lock files, commented this when need to collaborate with others
+.terraform.lock.hcl
+
 # Ignore local backend configuration files
 backend.conf
