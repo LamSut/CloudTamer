@@ -14,7 +14,7 @@ resource "aws_s3_bucket_public_access_block" "public_static_site" {
 
 resource "aws_s3_bucket_policy" "static_site_policy" {
   bucket = aws_s3_bucket.static_site.id
-  policy = file("${path.module}/s3_static_policy.json")
+  policy = file(var.static_policy)
 
   depends_on = [aws_s3_bucket_public_access_block.public_static_site]
 }
@@ -32,10 +32,10 @@ resource "aws_s3_bucket_website_configuration" "static_web_config" {
 }
 
 resource "aws_s3_object" "limweb" {
-  for_each     = fileset(path.module, "./limweb/**/*")
+  for_each     = fileset(var.asset_path, "**/*")
   bucket       = aws_s3_bucket.static_site.id
-  key          = replace(each.value, "./limweb/", "")
-  source       = "${path.module}/${each.value}"
-  etag         = filemd5("${path.module}/${each.value}")
+  key          = each.value
+  source       = "${var.asset_path}/${each.value}"
+  etag         = filemd5("${var.asset_path}/${each.value}")
   content_type = lookup(local.mime_types, regex("[^.]*$", each.value), "application/octet-stream")
 }

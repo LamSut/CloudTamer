@@ -3,7 +3,7 @@
 ###############################
 
 provider "aws" {
-  region = "us-east-1"
+  region = "ap-southeast-1"
 }
 
 terraform {
@@ -16,4 +16,7 @@ terraform {
 
 module "s3_static_site" {
   source = "../../../tf-modules/aws/s3"
+
+  static_policy = var.static_policy
+  asset_path    = var.asset_path
 }
