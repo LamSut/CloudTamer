@@ -65,6 +65,35 @@ resource "aws_subnet" "usa_private_subnet_2" {
   availability_zone       = var.availability_zone_2
 }
 
+resource "aws_eip" "usa_nat_eip" {
+  domain = "vpc"
+}
+
+resource "aws_nat_gateway" "usa_nat_gw" {
+  allocation_id = aws_eip.usa_nat_eip.id
+  subnet_id     = aws_subnet.usa_public_subnet_1.id
+  depends_on    = [aws_internet_gateway.usa_igw]
+}
+
+resource "aws_route_table" "usa_private_rt" {
+  vpc_id = aws_vpc.usa_vpc.id
+}
+
+resource "aws_route" "usa_private_rt_nat_route" {
+  route_table_id         = aws_route_table.usa_private_rt.id
+  destination_cidr_block = var.default_cidr
+  nat_gateway_id         = aws_nat_gateway.usa_nat_gw.id
+}
+
+resource "aws_route_table_association" "usa_private_assoc_1" {
+  subnet_id      = aws_subnet.usa_private_subnet_1.id
+  route_table_id = aws_route_table.usa_private_rt.id
+}
+
+resource "aws_route_table_association" "usa_private_assoc_2" {
+  subnet_id      = aws_subnet.usa_private_subnet_2.id
+  route_table_id = aws_route_table.usa_private_rt.id
+}
 
 #######################
 ### Security Groups ###

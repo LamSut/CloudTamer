@@ -3,6 +3,11 @@ output "vpc" {
   value       = aws_vpc.usa_vpc.id
 }
 
+output "vpc_cidr" {
+  description = "CIDR block of the VPC"
+  value       = aws_vpc.usa_vpc.cidr_block
+}
+
 output "public_subnet_1" {
   description = "ID of the public subnet"
   value       = aws_subnet.usa_public_subnet_1.id
@@ -18,6 +23,10 @@ output "private_subnet_2" {
   value       = aws_subnet.usa_private_subnet_2.id
 }
 
+output "private_rt" {
+  description = "ID of the private route table"
+  value       = aws_route_table.usa_private_rt.id
+}
 
 ##################
 ### SG Outputs ###

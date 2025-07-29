@@ -35,19 +35,20 @@ module "vpc_usa" {
   }
 }
 
-# module "vpc_peering" {
-#   source = "./vpc_peering"
-#   providers = {
-#     aws.reg_a = aws.virgin
-#     aws.reg_b = aws.ohio
-#   }
-#   vpc_a_id            = module.vpc_sing.vpc
-#   vpc_b_id            = module.vpc_usa.vpc
-#   vpc_a_cidr_block    = module.vpc_a.vpc_a_cidr_block
-#   vpc_b_cidr_block    = module.vpc_b.vpc_b_cidr_block
-#   vpc_a_private_rt_id = module.vpc_a.vpc_a_private_rt_id
-#   vpc_b_private_rt_id = module.vpc_b.vpc_b_private_rt_id
-# }
+module "vpc_peering" {
+  source = "../../../tf-modules/aws/vpc/peering"
+  providers = {
+    aws.a = aws.singapore
+    aws.b = aws.virgin
+  }
+  vpc_a            = module.vpc_sing.vpc
+  vpc_b            = module.vpc_usa.vpc
+  vpc_a_cidr_block = module.vpc_sing.vpc_cidr
+  vpc_b_cidr_block = module.vpc_usa.vpc_cidr
+  vpc_a_private_rt = module.vpc_sing.private_rt
+  vpc_b_private_rt = module.vpc_usa.private_rt
+  peer_region      = var.peer_region
+}
 
 ##################
 ### Module EC2 ###

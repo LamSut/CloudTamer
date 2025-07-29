@@ -1,3 +1,13 @@
+#########################
+### VPC Configuration ###
+#########################
+
+variable "peer_region" {
+  type    = string
+  default = "us-east-1"
+}
+
+
 ###########################
 ### EC2 Instances Coumt ###
 ###########################
