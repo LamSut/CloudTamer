@@ -15,22 +15,22 @@ variable "public_subnet_1_cidr" {
 
 variable "private_subnet_1_cidr" {
   type    = string
-  default = "10.0.100.0/24"
+  default = "10.0.101.0/24"
 }
 
 variable "private_subnet_2_cidr" {
   type    = string
-  default = "10.0.101.0/24"
+  default = "10.0.102.0/24"
 }
 
 variable "availability_zone_1" {
   type    = string
-  default = "us-east-1a"
+  default = "ap-southeast-1a"
 }
 
 variable "availability_zone_2" {
   type    = string
-  default = "us-east-1b"
+  default = "ap-southeast-1b"
 }
 
 

@@ -10,7 +10,7 @@ output "ec2_public_ips" {
   }
 }
 
-output "mysql_connect_cmd" {
-  description = "MySQL CLI connection string"
-  value       = "mysql -h ${module.rds.mysql_endpoint} -u limtruong -plimkhietngoingoi limdb"
-}
+# output "mysql_connect_cmd" {
+#   description = "MySQL CLI connection string"
+#   value       = "mysql -h ${module.rds.mysql_endpoint} -u limtruong -plimkhietngoingoi limdb"
+# }
