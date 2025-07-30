@@ -1,4 +1,4 @@
-variable "static_policy" {}
+variable "bucket_policy" {}
 variable "asset_path" {}
 
 data "aws_region" "current" {}

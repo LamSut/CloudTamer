@@ -14,7 +14,7 @@ resource "aws_s3_bucket_public_access_block" "public_static_site" {
 
 resource "aws_s3_bucket_policy" "static_site_policy" {
   bucket = aws_s3_bucket.static_site.id
-  policy = file(var.static_policy)
+  policy = file(var.bucket_policy)
 
   depends_on = [aws_s3_bucket_public_access_block.public_static_site]
 }
