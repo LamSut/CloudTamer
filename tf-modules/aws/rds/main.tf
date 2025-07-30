@@ -17,50 +17,85 @@ resource "aws_db_subnet_group" "rds_subnet_group" {
 }
 
 
-#################
-### MySQL RDS ###
-#################
+######################
+### RDS Parameters ###
+######################
 
-resource "aws_db_parameter_group" "mysql_params" {
-  name   = "mysql-slow-log"
-  family = "mysql8.0"
+resource "aws_db_parameter_group" "rds_param_group" {
+  name        = "${var.family}-param-group"
+  family      = var.family
+  description = "Parameter group for ${var.engine}"
 
-  parameter {
-    name  = "slow_query_log"
-    value = "1"
-  }
+  dynamic "parameter" {
+    for_each = var.engine == "mysql" ? [
+      {
+        name  = "slow_query_log"
+        value = "1"
+      },
+      {
+        name  = "long_query_time"
+        value = "1"
+      },
+      {
+        name  = "log_output"
+        value = "FILE"
+      },
+      {
+        name  = "log_queries_not_using_indexes"
+        value = "0"
+      }
+      ] : var.engine == "postgres" ? [
+      {
+        name  = "log_min_duration_statement"
+        value = "1000"
+      },
+      {
+        name  = "log_statement"
+        value = "none"
+      }
+    ] : []
 
-  parameter {
-    name  = "long_query_time"
-    value = "1"
-  }
-
-  parameter {
-    name  = "log_output"
-    value = "FILE" // Options: FILE or TABLE
-  }
-
-  parameter {
-    name  = "log_queries_not_using_indexes"
-    value = "0" // Set 1 to log queries that do not use indexes
+    content {
+      name  = parameter.value.name
+      value = parameter.value.value
+    }
   }
 }
 
-resource "aws_db_instance" "mysql" {
-  allocated_storage       = 10
-  db_name                 = "limdb"
-  engine                  = "mysql"
-  engine_version          = "8.0"
-  instance_class          = "db.t3.micro"
-  username                = "limtruong"
-  password                = "limkhietngoingoi"
+
+
+resource "aws_db_instance" "rds_instance" {
+  allocated_storage       = var.allocated_storage
+  db_name                 = var.db_name
+  engine                  = var.engine
+  engine_version          = var.engine_version
+  instance_class          = var.instance_class
+  username                = var.db_username
+  password                = var.db_password
   db_subnet_group_name    = aws_db_subnet_group.rds_subnet_group.name
   vpc_security_group_ids  = [var.sg_rds_ec2]
-  parameter_group_name    = aws_db_parameter_group.mysql_params.name
+  parameter_group_name    = aws_db_parameter_group.rds_param_group.name
   skip_final_snapshot     = true # No final snapshot before deletion
   publicly_accessible     = false
-  backup_retention_period = 7 # Backup every week
-  backup_window           = "18:00-19:00"
+  backup_retention_period = var.backup_retention_period
+  backup_window           = var.backup_window
 }
+
+# resource "aws_db_instance" "mysql" {
+#   allocated_storage       = 10
+#   db_name                 = "limdb"
+#   engine                  = "mysql"
+#   engine_version          = "8.0"
+#   instance_class          = "db.t3.micro"
+#   username                = "limtruong"
+#   password                = "limkhietngoingoi"
+#   db_subnet_group_name    = aws_db_subnet_group.rds_subnet_group.name
+#   vpc_security_group_ids  = [var.sg_rds_ec2]
+#   parameter_group_name    = aws_db_parameter_group.mysql_params.name
+#   skip_final_snapshot     = true # No final snapshot before deletion
+#   publicly_accessible     = false
+#   backup_retention_period = 7 # Backup every week
+#   backup_window           = "18:00-19:00"
+# }
 
 

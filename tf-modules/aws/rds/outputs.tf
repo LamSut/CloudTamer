@@ -1,3 +1,7 @@
-output "mysql_endpoint" {
-  value = split(":", aws_db_instance.mysql.endpoint)[0]
+output "rds_endpoint" {
+  value = aws_db_instance.rds_instance.endpoint
+}
+
+output "rds_host" {
+  value = aws_db_instance.rds_instance.address
 }

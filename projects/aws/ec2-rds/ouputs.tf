@@ -10,7 +10,12 @@ output "ec2_public_ips" {
   }
 }
 
-output "mysql_connect_cmd" {
-  description = "MySQL CLI connection string"
-  value       = "mysql -h ${module.rds.mysql_endpoint} -u limtruong -plimkhietngoingoi limdb"
+output "rds_connect_cmd" {
+  description = "Command to connect to RDS (you will be prompted for the password)"
+  value = (
+    var.engine == "postgres" ?
+    "psql -h ${module.rds.rds_host} -U ${var.db_username} -d ${var.db_name}" :
+    "mysql -h ${module.rds.rds_host} -u ${var.db_username} -p ${var.db_name}"
+  )
 }
+

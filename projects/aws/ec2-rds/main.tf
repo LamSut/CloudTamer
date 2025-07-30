@@ -94,6 +94,16 @@ module "rds" {
   vpc              = module.vpc_a.vpc
   private_subnet_1 = module.vpc_a.private_subnet_1
   private_subnet_2 = module.vpc_a.private_subnet_2
+  sg_rds_ec2       = module.vpc_a.sg_rds_ec2
 
-  sg_rds_ec2 = module.vpc_a.sg_rds_ec2
+  family                  = var.family
+  engine                  = var.engine
+  engine_version          = var.engine_version
+  instance_class          = var.instance_class
+  allocated_storage       = var.allocated_storage
+  db_name                 = var.db_name
+  db_username             = var.db_username
+  db_password             = var.db_password
+  backup_retention_period = var.backup_retention_period
+  backup_window           = var.backup_window
 }
