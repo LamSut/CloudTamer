@@ -1,4 +1,4 @@
-resource "aws_cloudfront_distribution" "static_site_distribution" {
+resource "aws_cloudfront_distribution" "static_website_distribution" {
   enabled             = true
   default_root_object = "index.html"
 
