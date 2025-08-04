@@ -1,11 +1,27 @@
-################################################
-### GCP Project Static Website Configuration ###
-################################################
+#################################
+### GCP Project Configuration ###
+#################################
 
-variable "project" {
+variable "project_name" {
+  description = "Name of the GCP project"
+  type        = string
+  default     = "static-website"
+}
+
+variable "project_id" {
   description = "GCP project ID"
   type        = string
-  default     = "static-website-468004"
+  default     = "static-website-696969"
+}
+
+variable "org_id" {
+  description = "GCP organization ID"
+  type        = string
+}
+
+variable "billing_account" {
+  description = "GCP billing account ID"
+  type        = string
 }
 
 

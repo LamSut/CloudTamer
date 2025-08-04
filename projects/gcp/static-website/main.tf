@@ -11,6 +11,18 @@ terraform {
   }
 }
 
+######################
+### Module Project ###
+######################
+
+module "project" {
+  source = "../../../tf-modules/gcp/project"
+
+  project_name    = var.project_name
+  project_id      = var.project_id
+  org_id          = var.org_id
+  billing_account = var.billing_account
+}
 
 ##################
 ### Module GCS ###
@@ -19,7 +31,7 @@ terraform {
 module "gcs" {
   source = "../../../tf-modules/gcp/gcs"
 
-  project = var.project
+  project = module.project.project_id
 
   bucket_name     = var.bucket_name
   bucket_location = var.bucket_location
