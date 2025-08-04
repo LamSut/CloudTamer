@@ -1,3 +1,7 @@
+############################
+### Bucket configuration ###
+############################
+
 variable "bucket_name" {
   type    = string
   default = "lim-static-website"
@@ -5,12 +9,17 @@ variable "bucket_name" {
 
 variable "bucket_policy" {
   type    = string
-  default = "./env/conf/s3_static_website_policy.json"
+  default = "./env/s3_static_website_policy.json"
 }
+
+
+####################################
+### Static website configuration ###
+####################################
 
 variable "asset_path" {
   type    = string
-  default = "./env/conf/limweb"
+  default = "../../../shared/static-website"
 }
 
 variable "index_suffix" {
@@ -22,6 +31,11 @@ variable "error_file" {
   type    = string
   default = "error.html"
 }
+
+
+################################
+### Mime types configuration ###
+################################
 
 locals {
   tags = {
