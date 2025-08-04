@@ -10,11 +10,18 @@ $ cd projects/<provider>/<project name>       # For example: cd /projects/aws/ec
 
 ## Introduction
 Ensure a Terraform backend configuration file exists:
+* Backend storage with S3:
 ```bash
 # backend.conf
 bucket = "<the S3 bucket name>"               # For example: "tfbucket"
-key    = "<state file path in S3>"            # For example: "tfstate"
+key    = "<state file path in S3>"            # For example: "path/to/tfstate"
 region = "<AWS region of S3>"                 # For example: "ap-southeast-1"
+```
+* Backend storage with GCS:
+```bash
+# backend.conf
+bucket = "<the GCS bucket name>"                    # For example: "tfbucket"
+prefix = "<prefix of state file path in GCS>"       # For example: "path/to"
 ```
 
 Initialize Terraform and configure the backend:
