@@ -63,7 +63,6 @@ resource "aws_db_parameter_group" "rds_param_group" {
 }
 
 
-
 resource "aws_db_instance" "rds_instance" {
   allocated_storage       = var.allocated_storage
   db_name                 = var.db_name

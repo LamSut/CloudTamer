@@ -12,30 +12,76 @@ provider "aws" {
   region = "us-east-1"
 }
 
+data "aws_region" "region_a" {
+  provider = aws.singapore
+}
+
+data "aws_region" "region_b" {
+  provider = aws.virgin
+}
+
 terraform {
   backend "s3" {}
 }
 
 
-##################
-### Module VPC ###
-##################
+####################
+### Module VPC A ###
+####################
+
+data "aws_availability_zones" "region_a_azs" {
+  provider = aws.singapore
+  state    = "available"
+}
 
 module "vpc_a" {
-  source = "../../../tf-modules/aws/vpc/sing"
+  source = "../../../tf-modules/aws/vpc/vpc-a"
   providers = {
     aws = aws.singapore
   }
-  vpc_dst_cidr = module.vpc_b.vpc_cidr
+
+  default_cidr   = var.default_cidr
+  vpc_a_dst_cidr = module.vpc_b.vpc_cidr
+
+  vpc_a_cidr                  = var.vpc_a_cidr
+  vpc_a_public_subnet_1_cidr  = var.vpc_a_public_subnet_1_cidr
+  vpc_a_private_subnet_1_cidr = var.vpc_a_private_subnet_1_cidr
+  vpc_a_private_subnet_2_cidr = var.vpc_a_private_subnet_2_cidr
+  vpc_a_availability_zone_1   = data.aws_availability_zones.region_a_azs.names[0]
+  vpc_a_availability_zone_2   = data.aws_availability_zones.region_a_azs.names[1]
+}
+
+
+####################
+### Module VPC B ###
+####################
+
+data "aws_availability_zones" "region_b_azs" {
+  provider = aws.virgin
+  state    = "available"
 }
 
 module "vpc_b" {
-  source = "../../../tf-modules/aws/vpc/usa"
+  source = "../../../tf-modules/aws/vpc/vpc-b"
   providers = {
     aws = aws.virgin
   }
-  vpc_dst_cidr = module.vpc_a.vpc_cidr
+
+  default_cidr   = var.default_cidr
+  vpc_b_dst_cidr = module.vpc_a.vpc_cidr
+
+  vpc_b_cidr                  = var.vpc_b_cidr
+  vpc_b_public_subnet_1_cidr  = var.vpc_b_public_subnet_1_cidr
+  vpc_b_private_subnet_1_cidr = var.vpc_b_private_subnet_1_cidr
+  vpc_b_private_subnet_2_cidr = var.vpc_b_private_subnet_2_cidr
+  vpc_b_availability_zone_1   = data.aws_availability_zones.region_b_azs.names[0]
+  vpc_b_availability_zone_2   = data.aws_availability_zones.region_b_azs.names[1]
 }
+
+
+##########################
+### Module VPC Peering ###
+##########################
 
 module "vpc_peering" {
   source = "../../../tf-modules/aws/vpc/peering"
@@ -51,7 +97,7 @@ module "vpc_peering" {
   vpc_b_public_rt  = module.vpc_b.public_rt
   vpc_a_private_rt = module.vpc_a.private_rt
   vpc_b_private_rt = module.vpc_b.private_rt
-  peer_region      = var.peer_region
+  peer_region      = data.aws_region.region_b.region
 }
 
 ##################

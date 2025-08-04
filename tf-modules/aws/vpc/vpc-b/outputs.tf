@@ -4,39 +4,38 @@
 
 output "vpc" {
   description = "ID of the VPC"
-  value       = aws_vpc.sing_vpc.id
+  value       = aws_vpc.vpc_b.id
 }
 
 output "vpc_cidr" {
   description = "CIDR block of the VPC"
-  value       = aws_vpc.sing_vpc.cidr_block
+  value       = aws_vpc.vpc_b.cidr_block
 }
 
 output "public_subnet_1" {
   description = "ID of the public subnet"
-  value       = aws_subnet.sing_public_subnet_1.id
+  value       = aws_subnet.vpc_b_public_subnet_1.id
 }
 
 output "private_subnet_1" {
   description = "ID of the private subnet"
-  value       = aws_subnet.sing_private_subnet_1.id
+  value       = aws_subnet.vpc_b_private_subnet_1.id
 }
 
 output "private_subnet_2" {
   description = "ID of the private subnet"
-  value       = aws_subnet.sing_private_subnet_2.id
+  value       = aws_subnet.vpc_b_private_subnet_2.id
 }
 
 output "public_rt" {
   description = "ID of the public route table"
-  value       = aws_route_table.sing_public_rt.id
+  value       = aws_route_table.vpc_b_public_rt.id
 }
 
 output "private_rt" {
   description = "ID of the private route table"
-  value       = aws_route_table.sing_private_rt.id
+  value       = aws_route_table.vpc_b_private_rt.id
 }
-
 
 ##################
 ### SG Outputs ###
@@ -44,15 +43,15 @@ output "private_rt" {
 
 output "sg_ssh" {
   description = "ID of the SSH security group"
-  value       = aws_security_group.sing_sg_ssh.id
+  value       = aws_security_group.vpc_b_sg_ssh.id
 }
 
 output "sg_rdp" {
   description = "ID of the RDP security group"
-  value       = aws_security_group.sing_sg_rdp.id
+  value       = aws_security_group.vpc_b_sg_rdp.id
 }
 
 output "sg_rds_ec2" {
   description = "ID of the RDP security group"
-  value       = aws_security_group.sing_sg_rds_ec2.id
+  value       = aws_security_group.vpc_b_sg_rds_ec2.id
 }
