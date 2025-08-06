@@ -118,10 +118,13 @@ module "ec2" {
   public_subnet_a1 = module.vpc_a.public_subnet_1
   public_subnet_b1 = module.vpc_b.public_subnet_1
 
-  sg_ssh_a = module.vpc_a.sg_ssh
-  sg_rdp_a = module.vpc_a.sg_rdp
-  sg_ssh_b = module.vpc_b.sg_ssh
-  sg_rdp_b = module.vpc_b.sg_rdp
+  sg_http_a = module.vpc_a.sg_http
+  sg_ssh_a  = module.vpc_a.sg_ssh
+  sg_rdp_a  = module.vpc_a.sg_rdp
+
+  sg_http_b = module.vpc_b.sg_http
+  sg_ssh_b  = module.vpc_b.sg_ssh
+  sg_rdp_b  = module.vpc_b.sg_rdp
 
   key_name      = var.key_name
   instance_type = var.instance_type
