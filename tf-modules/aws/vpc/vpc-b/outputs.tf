@@ -41,6 +41,11 @@ output "private_rt" {
 ### SG Outputs ###
 ##################
 
+output "sg_http" {
+  description = "ID of the HTTP security group"
+  value       = aws_security_group.vpc_b_sg_http.id
+}
+
 output "sg_ssh" {
   description = "ID of the SSH security group"
   value       = aws_security_group.vpc_b_sg_ssh.id

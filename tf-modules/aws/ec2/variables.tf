@@ -4,8 +4,12 @@
 
 variable "public_subnet_a1" {}
 variable "public_subnet_b1" {}
+
+variable "sg_http_a" {}
 variable "sg_ssh_a" {}
 variable "sg_rdp_a" {}
+
+variable "sg_http_b" {}
 variable "sg_ssh_b" {}
 variable "sg_rdp_b" {}
 

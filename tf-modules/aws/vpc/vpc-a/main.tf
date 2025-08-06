@@ -99,17 +99,10 @@ resource "aws_route_table_association" "vpc_a_private_assoc_2" {
 ### Security Groups ###
 #######################
 
-resource "aws_security_group" "vpc_a_sg_ssh" {
-  name        = "sg_ssh"
-  description = "Allow SSH access"
+resource "aws_security_group" "vpc_a_sg_http" {
+  name        = "sg_http"
+  description = "Allow HTTP & HTTPS access"
   vpc_id      = aws_vpc.vpc_a.id
-
-  ingress {
-    from_port   = 22
-    to_port     = 22
-    protocol    = "tcp"
-    cidr_blocks = ["0.0.0.0/0"]
-  }
 
   ingress {
     from_port   = 80
@@ -133,6 +126,26 @@ resource "aws_security_group" "vpc_a_sg_ssh" {
   }
 }
 
+resource "aws_security_group" "vpc_a_sg_ssh" {
+  name        = "sg_ssh"
+  description = "Allow SSH access"
+  vpc_id      = aws_vpc.vpc_a.id
+
+  ingress {
+    from_port   = 22
+    to_port     = 22
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
+  egress {
+    from_port   = 0
+    to_port     = 0
+    protocol    = "-1"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+}
+
 resource "aws_security_group" "vpc_a_sg_rdp" {
   name        = "sg_rdp"
   description = "Allow RDP access"
@@ -141,13 +154,6 @@ resource "aws_security_group" "vpc_a_sg_rdp" {
   ingress {
     from_port   = 3389
     to_port     = 3389
-    protocol    = "tcp"
-    cidr_blocks = ["0.0.0.0/0"]
-  }
-
-  ingress {
-    from_port   = 80
-    to_port     = 80
     protocol    = "tcp"
     cidr_blocks = ["0.0.0.0/0"]
   }

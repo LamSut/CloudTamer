@@ -24,7 +24,7 @@ resource "aws_instance" "ec2_amazon" {
   }
 
   subnet_id              = var.public_subnet_a1
-  vpc_security_group_ids = [var.sg_ssh_a]
+  vpc_security_group_ids = [var.sg_ssh_a, var.sg_http_a]
 
   tags = {
     Name = "Amazon Linux ${count.index}"
@@ -56,7 +56,7 @@ resource "aws_instance" "ec2_ubuntu" {
   }
 
   subnet_id              = var.public_subnet_b1
-  vpc_security_group_ids = [var.sg_ssh_b]
+  vpc_security_group_ids = [var.sg_ssh_b, var.sg_http_b]
 
   tags = {
     Name = "Ubuntu ${count.index}"
@@ -88,7 +88,7 @@ resource "aws_instance" "ec2_windows" {
   }
 
   subnet_id              = var.public_subnet_a1
-  vpc_security_group_ids = [var.sg_rdp_a]
+  vpc_security_group_ids = [var.sg_rdp_a, var.sg_http_a]
 
   tags = {
     Name = "Windows ${count.index}"
