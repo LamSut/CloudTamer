@@ -28,6 +28,7 @@ module "project" {
 
 locals {
   region_singapore = "asia-southeast1"
+  region_usa       = "us-central1"
   project_id       = module.project.project_id
 }
 
@@ -37,6 +38,11 @@ provider "google" {
   region  = local.region_singapore
 }
 
+provider "google" {
+  alias   = "usa"
+  project = local.project_id
+  region  = local.region_usa
+}
 
 #######################
 ### Module Services ###
@@ -83,7 +89,7 @@ module "vpc_a" {
 module "vpc_b" {
   source = "../../../tf-modules/gcp/vpc/vpc-b"
   providers = {
-    google = google.singapore
+    google = google.usa
   }
   depends_on = [null_resource.wait]
 
@@ -91,4 +97,22 @@ module "vpc_b" {
 
   vpc_b_private_subnet_1_cidr = var.vpc_b_private_subnet_1_cidr
   vpc_b_private_subnet_2_cidr = var.vpc_b_private_subnet_2_cidr
+}
+
+
+##########################
+### Module VPC Peering ###
+##########################
+
+module "peering" {
+  source = "../../../tf-modules/gcp/vpc/peering"
+  providers = {
+    google.a = google.singapore
+    google.b = google.usa
+  }
+
+  vpc_a_name      = module.vpc_a.vpc_a_name
+  vpc_a_self_link = module.vpc_a.vpc_a_self_link
+  vpc_b_name      = module.vpc_b.vpc_b_name
+  vpc_b_self_link = module.vpc_b.vpc_b_self_link
 }
