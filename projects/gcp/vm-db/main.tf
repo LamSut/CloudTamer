@@ -53,7 +53,7 @@ resource "null_resource" "wait" {
   depends_on = [module.services]
 
   provisioner "local-exec" {
-    command = "sleep 30"
+    command = var.is_windows ? "powershell -Command \"Start-Sleep -Seconds 30\"" : "sleep 30"
   }
 }
 

@@ -1,3 +1,14 @@
+########################
+### Linux or Windows ###
+########################
+
+variable "is_windows" {
+  description = "Set to true if running Terraform on Windows"
+  type        = bool
+  default     = true
+}
+
+
 #################################
 ### GCP Project Configuration ###
 #################################
