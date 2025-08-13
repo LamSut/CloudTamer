@@ -5,7 +5,7 @@ It offers built-in support for multi-cloud deployments.
 ## Get started
 Change working directory to your desired project:
 ```bash
-$ cd projects/<provider>/<project name>       # For example: cd /projects/aws/ec2-rds
+$ cd examples/<provider>/<project name>       # For example: cd /projects/aws/ec2-rds
 ```
 
 ## Introduction
