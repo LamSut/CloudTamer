@@ -25,24 +25,14 @@ resource "google_compute_subnetwork" "vpc_b_public_subnet_1" {
   name                     = "vpc-b-public-subnet-1"
   ip_cidr_range            = var.vpc_b_public_subnet_1_cidr
   network                  = google_compute_network.vpc_b.id
-  private_ip_google_access = true
+  private_ip_google_access = false
 }
 
-resource "google_compute_router" "vpc_b_router" {
-  name    = "vpc-b-router"
-  network = google_compute_network.vpc_b.id
-}
-
-resource "google_compute_address" "vpc_b_nat_ip" {
-  name = "vpc-b-nat-ip"
-}
-
-resource "google_compute_router_nat" "vpc_b_nat_gw" {
-  name                               = "vpc-b-nat-gw"
-  router                             = google_compute_router.vpc_b_router.name
-  nat_ip_allocate_option             = "MANUAL_ONLY"
-  nat_ips                            = [google_compute_address.vpc_b_nat_ip.id]
-  source_subnetwork_ip_ranges_to_nat = "ALL_SUBNETWORKS_ALL_IP_RANGES"
+resource "google_compute_route" "vpc_b_public_default_route" {
+  name             = "vpc-b-public-default-route"
+  network          = google_compute_network.vpc_b.name
+  dest_range       = "0.0.0.0/0"
+  next_hop_gateway = "default-internet-gateway"
 }
 
 
@@ -62,6 +52,38 @@ resource "google_compute_subnetwork" "vpc_b_private_subnet_2" {
   ip_cidr_range            = var.vpc_b_private_subnet_2_cidr
   network                  = google_compute_network.vpc_b.id
   private_ip_google_access = true
+}
+
+
+########################
+### Router + NAT GW  ###
+########################
+
+resource "google_compute_router" "vpc_b_router" {
+  name    = "vpc-b-router"
+  network = google_compute_network.vpc_b.id
+}
+
+resource "google_compute_address" "vpc_b_nat_ip" {
+  name = "vpc-b-nat-ip"
+}
+
+resource "google_compute_router_nat" "vpc_b_nat_gw" {
+  name                               = "vpc-b-nat-gw"
+  router                             = google_compute_router.vpc_b_router.name
+  nat_ip_allocate_option             = "MANUAL_ONLY"
+  nat_ips                            = [google_compute_address.vpc_b_nat_ip.self_link]
+  source_subnetwork_ip_ranges_to_nat = "LIST_OF_SUBNETWORKS"
+
+  subnetwork {
+    name                    = google_compute_subnetwork.vpc_b_private_subnet_1.id
+    source_ip_ranges_to_nat = ["ALL_IP_RANGES"]
+  }
+
+  subnetwork {
+    name                    = google_compute_subnetwork.vpc_b_private_subnet_2.id
+    source_ip_ranges_to_nat = ["ALL_IP_RANGES"]
+  }
 }
 
 

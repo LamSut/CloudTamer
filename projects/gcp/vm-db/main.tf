@@ -48,19 +48,16 @@ provider "google" {
 ### Module Services ###
 #######################
 
-module "services" {
-  source = "../../../tf-modules/gcp/services"
+module "service" {
+  source = "../../../tf-modules/gcp/service"
   providers = {
     google = google.singapore
   }
 }
 
-resource "null_resource" "wait" {
-  depends_on = [module.services]
-
-  provisioner "local-exec" {
-    command = var.is_windows ? "powershell -Command \"Start-Sleep -Seconds 30\"" : "sleep 30"
-  }
+resource "time_sleep" "wait_service" {
+  depends_on      = [module.service]
+  create_duration = "15s"
 }
 
 
@@ -73,7 +70,7 @@ module "vpc_a" {
   providers = {
     google = google.singapore
   }
-  depends_on = [null_resource.wait]
+  depends_on = [time_sleep.wait_service]
 
   vpc_a_public_subnet_1_cidr = var.vpc_a_public_subnet_1_cidr
 
@@ -91,7 +88,7 @@ module "vpc_b" {
   providers = {
     google = google.usa
   }
-  depends_on = [null_resource.wait]
+  depends_on = [time_sleep.wait_service]
 
   vpc_b_public_subnet_1_cidr = var.vpc_b_public_subnet_1_cidr
 
@@ -104,12 +101,21 @@ module "vpc_b" {
 ### Module VPC Peering ###
 ##########################
 
+resource "time_sleep" "wait_vpc" {
+  depends_on = [
+    module.vpc_a,
+    module.vpc_b
+  ]
+  create_duration = "30s"
+}
+
 module "peering" {
   source = "../../../tf-modules/gcp/vpc/peering"
   providers = {
     google.a = google.singapore
     google.b = google.usa
   }
+  depends_on = [time_sleep.wait_vpc]
 
   vpc_a_name      = module.vpc_a.vpc_a_name
   vpc_a_self_link = module.vpc_a.vpc_a_self_link
