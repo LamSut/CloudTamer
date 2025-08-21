@@ -42,4 +42,4 @@ terraform.rc
 .terraform.lock.hcl
 
 # Ignore local backend configuration files
-backend.conf
+*.conf

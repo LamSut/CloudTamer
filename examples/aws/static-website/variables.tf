@@ -9,7 +9,7 @@ variable "bucket_name" {
 
 variable "bucket_policy" {
   type    = string
-  default = "./env/s3_static_website_policy.json"
+  default = "./s3_static_website_policy.json"
 }
 
 
