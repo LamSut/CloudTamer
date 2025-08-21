@@ -2,18 +2,18 @@
 A Terraform boilerplate for provisioning infrastructure on AWS, Azure and GCP.  
 It offers built-in support for multi-cloud deployments.
 
-## Introduction
-Ensure a Terraform backend configuration file exists:
-* Backend storage with S3:
+## Setup
+Ensure a Terraform backend configuration file exists in each project: [Documentation](https://developer.hashicorp.com/terraform/language/backend)  
+Optionally, a `.tfvars` file can be added to define variable values: [Documentation](https://developer.hashicorp.com/terraform/language/values/variables)
+
+<img width="1103" height="440" alt="image" src="https://github.com/user-attachments/assets/5186200a-15ba-4fe2-b71d-e09c8132078f" />
+
+## Usage
+Provision the cloud infrastructure using Terraform:
 ```bash
-# examples/aws/vm-db/backend/dev.conf
-bucket = "<the S3 bucket name>"               # For example: "tfbucket"
-key    = "<state file path in S3>"            # For example: "path/to/tfstate"
-region = "<AWS region of S3>"                 # For example: "ap-southeast-1"
+$ ./provision <cloud provider> <project> <environment>  # For example: ./provision aws vm-db dev 
 ```
-* Backend storage with GCS:
+Tear down infrastructure using Terraform:
 ```bash
-# examples/aws/vm-db/backend/dev.conf
-bucket = "<the GCS bucket name>"                    # For example: "tfbucket"
-prefix = "<prefix of state file path in GCS>"       # For example: "path/to"
+$ ./destroy <cloud provider> <project> <environment>  # For example: ./destroy aws vm-db dev 
 ```
