@@ -43,3 +43,6 @@ terraform.rc
 
 # Ignore local backend configuration files
 *.conf
+
+# Ignore cloned repositories
+repo
