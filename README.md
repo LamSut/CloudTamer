@@ -1,6 +1,5 @@
 # CloudTamer
-A Terraform boilerplate for provisioning infrastructure on AWS, Azure and GCP.  
-It offers built-in support for multi-cloud deployments.
+A reusable Terraform boilerplate for provisioning infrastructure on AWS, Azure and GCP, with built-in support for multi-cloud deployments. Contributions are welcome to improve this project.
 
 ## Setup
 * Ensure a Terraform backend configuration file exists in each project: [Documentation](https://developer.hashicorp.com/terraform/language/backend)  
