@@ -45,6 +45,7 @@ module "vpc_a" {
 
   vpc_a_cidr                  = var.vpc_a_cidr
   vpc_a_public_subnet_1_cidr  = var.vpc_a_public_subnet_1_cidr
+  vpc_a_public_subnet_2_cidr  = var.vpc_a_public_subnet_2_cidr
   vpc_a_private_subnet_1_cidr = var.vpc_a_private_subnet_1_cidr
   vpc_a_private_subnet_2_cidr = var.vpc_a_private_subnet_2_cidr
   vpc_a_availability_zone_1   = data.aws_availability_zones.region_a_azs.names[0]
@@ -72,6 +73,7 @@ module "vpc_b" {
 
   vpc_b_cidr                  = var.vpc_b_cidr
   vpc_b_public_subnet_1_cidr  = var.vpc_b_public_subnet_1_cidr
+  vpc_b_public_subnet_2_cidr  = var.vpc_b_public_subnet_2_cidr
   vpc_b_private_subnet_1_cidr = var.vpc_b_private_subnet_1_cidr
   vpc_b_private_subnet_2_cidr = var.vpc_b_private_subnet_2_cidr
   vpc_b_availability_zone_1   = data.aws_availability_zones.region_b_azs.names[0]

@@ -29,6 +29,13 @@ resource "aws_subnet" "vpc_b_public_subnet_1" {
   availability_zone       = var.vpc_b_availability_zone_1
 }
 
+resource "aws_subnet" "vpc_b_public_subnet_2" {
+  vpc_id                  = aws_vpc.vpc_b.id
+  cidr_block              = var.vpc_b_public_subnet_2_cidr
+  map_public_ip_on_launch = true
+  availability_zone       = var.vpc_b_availability_zone_2
+}
+
 resource "aws_internet_gateway" "vpc_b_igw" {
   vpc_id = aws_vpc.vpc_b.id
 }
@@ -41,8 +48,13 @@ resource "aws_route_table" "vpc_b_public_rt" {
   }
 }
 
-resource "aws_route_table_association" "vpc_b_public_assoc" {
+resource "aws_route_table_association" "vpc_b_public_assoc_1" {
   subnet_id      = aws_subnet.vpc_b_public_subnet_1.id
+  route_table_id = aws_route_table.vpc_b_public_rt.id
+}
+
+resource "aws_route_table_association" "vpc_b_public_assoc_2" {
+  subnet_id      = aws_subnet.vpc_b_public_subnet_2.id
   route_table_id = aws_route_table.vpc_b_public_rt.id
 }
 
