@@ -32,7 +32,7 @@ module "vpc_a" {
   }
 
   default_cidr   = var.default_cidr
-  vpc_a_dst_cidr = module.vpc_b.vpc_cidr
+  vpc_a_dst_cidr = var.vpc_a_cidr
 
   vpc_a_cidr                  = var.vpc_a_cidr
   vpc_a_public_subnet_1_cidr  = var.vpc_a_public_subnet_1_cidr
@@ -45,9 +45,27 @@ module "vpc_a" {
 
 
 ##################
-### Module ECS ###
+### Module ECR ###
 ##################
 
-module "ecs" {
-  source = "../../../tf-modules/aws/ecs"
+resource "aws_ecr_repository" "frontend_repo" {
+  provider = aws.singapore
+  name     = "frontend"
 }
+
+resource "aws_ecr_repository" "backend_repo" {
+  provider = aws.singapore
+  name     = "backend"
+}
+
+resource "null_resource" "get_docker_compose" {
+  depends_on = [
+    aws_ecr_repository.frontend_repo,
+    aws_ecr_repository.backend_repo
+  ]
+
+  provisioner "local-exec" {
+    command = "bash ../../../shared/docker-compose/get.sh"
+  }
+}
+

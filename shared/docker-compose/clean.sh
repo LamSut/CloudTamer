@@ -1,7 +1,12 @@
 #!/bin/bash
 
-# WARNING: THIS SCRIPT WILL REMOVE ALL RESOURCES
+# WARNING: THIS SCRIPT WILL REMOVE ALL RESOURCES IN LOCAL HOST
 # Usage: chmod 755 rm.sh && ./rm.sh
+
+echo "Cleaning up the repository..."
+rm -rf ../../examples/aws/docker/repo
+rm -rf ../../examples/azure/docker/repo
+rm -rf ../../examples/gcp/docker/repo
 
 echo "Stopping all running containers..."
 docker stop $(docker ps -aq) 2>/dev/null || echo "No running containers to stop."
