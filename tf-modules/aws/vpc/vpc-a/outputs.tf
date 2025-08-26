@@ -14,12 +14,12 @@ output "vpc_cidr" {
 
 output "public_subnet" {
   description = "IDs of the public subnets"
-  value       = aws_subnet.vpc_a_public_subnet[*].id
+  value       = { for k, subnet in aws_subnet.vpc_a_public_subnet : k => subnet.id }
 }
 
 output "private_subnet" {
   description = "IDs of the private subnets"
-  value       = aws_subnet.vpc_a_private_subnet[*].id
+  value       = { for k, subnet in aws_subnet.vpc_a_private_subnet : k => subnet.id }
 }
 
 output "public_rt" {
@@ -28,10 +28,9 @@ output "public_rt" {
 }
 
 output "private_rt" {
-  description = "ID of the private route table"
-  value       = aws_route_table.vpc_a_private_rt[*].id
+  description = "IDs of the private route tables (per AZ)"
+  value       = { for k, rt in aws_route_table.vpc_a_private_rt : k => rt.id }
 }
-
 
 ##################
 ### SG Outputs ###
@@ -53,6 +52,6 @@ output "sg_rdp" {
 }
 
 output "sg_rds_ec2" {
-  description = "ID of the RDP security group"
+  description = "ID of the RDS security group"
   value       = aws_security_group.vpc_a_sg_rds_ec2.id
 }

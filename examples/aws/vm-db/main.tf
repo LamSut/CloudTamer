@@ -43,11 +43,9 @@ module "vpc_a" {
   default_cidr   = var.default_cidr
   vpc_a_dst_cidr = module.vpc_b.vpc_cidr
 
-  vpc_a_cidr                 = var.vpc_a_cidr
-  vpc_a_public_subnet_count  = var.vpc_a_public_subnet_count
-  vpc_a_private_subnet_count = var.vpc_a_private_subnet_count
-  vpc_a_availability_zone_1  = data.aws_availability_zones.region_a_azs.names[0]
-  vpc_a_availability_zone_2  = data.aws_availability_zones.region_a_azs.names[1]
+  vpc_a_cidr                = var.vpc_a_cidr
+  vpc_a_availability_zone_1 = data.aws_availability_zones.region_a_azs.names[0]
+  vpc_a_availability_zone_2 = data.aws_availability_zones.region_a_azs.names[1]
 }
 
 
@@ -69,11 +67,9 @@ module "vpc_b" {
   default_cidr   = var.default_cidr
   vpc_b_dst_cidr = module.vpc_a.vpc_cidr
 
-  vpc_b_cidr                 = var.vpc_b_cidr
-  vpc_b_public_subnet_count  = var.vpc_a_public_subnet_count
-  vpc_b_private_subnet_count = var.vpc_a_private_subnet_count
-  vpc_b_availability_zone_1  = data.aws_availability_zones.region_b_azs.names[0]
-  vpc_b_availability_zone_2  = data.aws_availability_zones.region_b_azs.names[1]
+  vpc_b_cidr                = var.vpc_b_cidr
+  vpc_b_availability_zone_1 = data.aws_availability_zones.region_b_azs.names[0]
+  vpc_b_availability_zone_2 = data.aws_availability_zones.region_b_azs.names[1]
 }
 
 
@@ -87,15 +83,17 @@ module "vpc_peering" {
     aws.a = aws.singapore
     aws.b = aws.virgin
   }
-  vpc_a            = module.vpc_a.vpc
-  vpc_b            = module.vpc_b.vpc
-  vpc_a_cidr       = module.vpc_a.vpc_cidr
-  vpc_b_cidr       = module.vpc_b.vpc_cidr
-  vpc_a_public_rt  = module.vpc_a.public_rt
-  vpc_b_public_rt  = module.vpc_b.public_rt
-  vpc_a_private_rt = module.vpc_a.private_rt
-  vpc_b_private_rt = module.vpc_b.private_rt
-  peer_region      = data.aws_region.region_b.region
+  vpc_a              = module.vpc_a.vpc
+  vpc_b              = module.vpc_b.vpc
+  vpc_a_cidr         = module.vpc_a.vpc_cidr
+  vpc_b_cidr         = module.vpc_b.vpc_cidr
+  vpc_a_public_rt    = module.vpc_a.public_rt
+  vpc_b_public_rt    = module.vpc_b.public_rt
+  vpc_a_private_rt_1 = module.vpc_a.private_rt["az1"]
+  vpc_a_private_rt_2 = module.vpc_a.private_rt["az2"]
+  vpc_b_private_rt_1 = module.vpc_b.private_rt["az1"]
+  vpc_b_private_rt_2 = module.vpc_b.private_rt["az2"]
+  peer_region        = data.aws_region.region_b.region
 }
 
 ##################
@@ -113,8 +111,8 @@ module "ec2" {
   ubuntu_count  = var.ubuntu_count
   windows_count = var.windows_count
 
-  public_subnet_a1 = module.vpc_a.public_subnet[0]
-  public_subnet_b1 = module.vpc_b.public_subnet[0]
+  public_subnet_a1 = module.vpc_a.public_subnet["az1"]
+  public_subnet_b1 = module.vpc_b.public_subnet["az2"]
 
   sg_http_a = module.vpc_a.sg_http
   sg_ssh_a  = module.vpc_a.sg_ssh
@@ -139,8 +137,8 @@ module "rds" {
   }
 
   vpc              = module.vpc_a.vpc
-  private_subnet_1 = module.vpc_a.private_subnet[0]
-  private_subnet_2 = module.vpc_a.private_subnet[1]
+  private_subnet_1 = module.vpc_a.private_subnet["az1"]
+  private_subnet_2 = module.vpc_a.private_subnet["az2"]
   sg_rds_ec2       = module.vpc_a.sg_rds_ec2
 
   family                  = var.family

@@ -4,6 +4,8 @@ variable "vpc_a_cidr" {}
 variable "vpc_b_cidr" {}
 variable "vpc_a_public_rt" {}
 variable "vpc_b_public_rt" {}
-variable "vpc_a_private_rt" {}
-variable "vpc_b_private_rt" {}
+variable "vpc_a_private_rt_1" {}
+variable "vpc_a_private_rt_2" {}
+variable "vpc_b_private_rt_1" {}
+variable "vpc_b_private_rt_2" {}
 variable "peer_region" {}

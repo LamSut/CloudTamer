@@ -17,16 +17,6 @@ variable "vpc_a_cidr" {
   default = "10.0.0.0/16"
 }
 
-variable "vpc_a_public_subnet_count" {
-  type    = number
-  default = 1
-}
-
-variable "vpc_a_private_subnet_count" {
-  type    = number
-  default = 2
-}
-
 
 ###########################
 ### VPC B Configuration ###
@@ -35,16 +25,6 @@ variable "vpc_a_private_subnet_count" {
 variable "vpc_b_cidr" {
   type    = string
   default = "10.1.0.0/16"
-}
-
-variable "vpc_b_public_subnet_count" {
-  type    = number
-  default = 1
-}
-
-variable "vpc_b_private_subnet_count" {
-  type    = number
-  default = 2
 }
 
 

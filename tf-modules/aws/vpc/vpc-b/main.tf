@@ -17,32 +17,34 @@ resource "aws_vpc" "vpc_b" {
   tags                 = { Name = "vpc-b" }
 }
 
-
 #####################
 ### Public Subnet ###
 #####################
 
 resource "aws_subnet" "vpc_b_public_subnet" {
-  count                   = var.vpc_b_public_subnet_count
+  for_each = {
+    "az1" = { az = var.vpc_b_availability_zone_1, idx = 0 }
+    "az2" = { az = var.vpc_b_availability_zone_2, idx = 1 }
+  }
+
   vpc_id                  = aws_vpc.vpc_b.id
-  cidr_block              = cidrsubnet(cidrsubnet(var.vpc_b_cidr, 1, 0), 7, count.index)
-  availability_zone       = element([var.vpc_b_availability_zone_1, var.vpc_b_availability_zone_2], count.index)
+  cidr_block              = cidrsubnet(cidrsubnet(var.vpc_b_cidr, 1, 0), 7, each.value.idx)
+  availability_zone       = each.value.az
   map_public_ip_on_launch = true
 
   tags = {
-    Name = "vpc-b-public-subnet-${count.index}"
+    Name = "vpc-b-public-subnet-${each.key}"
   }
 }
 
 resource "aws_internet_gateway" "vpc_b_igw" {
   vpc_id = aws_vpc.vpc_b.id
-  tags = {
-    Name = "vpc-b-igw"
-  }
+  tags   = { Name = "vpc-b-igw" }
 }
 
 resource "aws_route_table" "vpc_b_public_rt" {
   vpc_id = aws_vpc.vpc_b.id
+
   route {
     cidr_block = var.default_cidr
     gateway_id = aws_internet_gateway.vpc_b_igw.id
@@ -50,68 +52,71 @@ resource "aws_route_table" "vpc_b_public_rt" {
 }
 
 resource "aws_route_table_association" "vpc_b_public_assoc" {
-  count          = var.vpc_b_public_subnet_count
-  subnet_id      = aws_subnet.vpc_b_public_subnet[count.index].id
+  for_each       = aws_subnet.vpc_b_public_subnet
+  subnet_id      = each.value.id
   route_table_id = aws_route_table.vpc_b_public_rt.id
 }
-
 
 ######################
 ### Private Subnet ###
 ######################
 
 resource "aws_subnet" "vpc_b_private_subnet" {
-  count                   = var.vpc_b_private_subnet_count
+  for_each = {
+    "az1" = { az = var.vpc_b_availability_zone_1, idx = 0 }
+    "az2" = { az = var.vpc_b_availability_zone_2, idx = 1 }
+  }
+
   vpc_id                  = aws_vpc.vpc_b.id
-  cidr_block              = cidrsubnet(cidrsubnet(var.vpc_b_cidr, 1, 1), 7, count.index)
-  availability_zone       = element([var.vpc_b_availability_zone_1, var.vpc_b_availability_zone_2], count.index)
+  cidr_block              = cidrsubnet(cidrsubnet(var.vpc_b_cidr, 1, 1), 7, each.value.idx)
+  availability_zone       = each.value.az
   map_public_ip_on_launch = false
 
   tags = {
-    Name = "vpc-b-private-subnet-${count.index}"
+    Name = "vpc-b-private-subnet-${each.key}"
   }
 }
 
 resource "aws_eip" "vpc_b_nat_eip" {
-  count  = length(aws_subnet.vpc_b_private_subnet)
-  domain = "vpc"
+  for_each = aws_subnet.vpc_b_public_subnet
+  domain   = "vpc"
 
   tags = {
-    Name = "vpc-b-nat-eip-${count.index}"
+    Name = "vpc-b-nat-eip-${each.key}"
   }
 }
 
 resource "aws_nat_gateway" "vpc_b_nat_gw" {
-  count         = length(aws_subnet.vpc_b_private_subnet)
-  allocation_id = aws_eip.vpc_b_nat_eip[count.index].id
-  subnet_id     = aws_subnet.vpc_b_private_subnet[count.index].id
+  for_each      = aws_eip.vpc_b_nat_eip
+  allocation_id = each.value.id
+  subnet_id     = aws_subnet.vpc_b_public_subnet[each.key].id
   depends_on    = [aws_internet_gateway.vpc_b_igw]
 
   tags = {
-    Name = "vpc-b-nat-gw-${count.index}"
+    Name = "vpc-b-nat-gw-${each.key}"
   }
 }
 
 resource "aws_route_table" "vpc_b_private_rt" {
-  count  = length(aws_subnet.vpc_b_private_subnet)
-  vpc_id = aws_vpc.vpc_b.id
+  for_each = aws_nat_gateway.vpc_b_nat_gw
+  vpc_id   = aws_vpc.vpc_b.id
 
   tags = {
-    Name = "vpc-b-private-rt-${count.index}"
+    Name = "vpc-b-private-rt-${each.key}"
   }
 }
 
 resource "aws_route" "vpc_b_private_rt_nat_route" {
-  count                  = length(aws_subnet.vpc_b_private_subnet)
-  route_table_id         = aws_route_table.vpc_b_private_rt[count.index].id
+  for_each               = aws_route_table.vpc_b_private_rt
+  route_table_id         = each.value.id
   destination_cidr_block = "0.0.0.0/0"
-  nat_gateway_id         = aws_nat_gateway.vpc_b_nat_gw[count.index].id
+  nat_gateway_id         = aws_nat_gateway.vpc_b_nat_gw[each.key].id
 }
 
 resource "aws_route_table_association" "vpc_b_private_assoc" {
-  count          = length(aws_subnet.vpc_b_private_subnet)
-  subnet_id      = aws_subnet.vpc_b_private_subnet[count.index].id
-  route_table_id = aws_route_table.vpc_b_private_rt[count.index].id
+  for_each       = aws_subnet.vpc_b_private_subnet
+  subnet_id      = each.value.id
+  route_table_id = aws_route_table.vpc_b_private_rt[each.key].id
 }
 
 #######################

@@ -17,16 +17,6 @@ variable "vpc_a_cidr" {
   default = "10.0.0.0/16"
 }
 
-variable "vpc_a_public_subnet_count" {
-  type    = number
-  default = 2
-}
-
-variable "vpc_a_private_subnet_count" {
-  type    = number
-  default = 2
-}
-
 
 #########################
 ### ECR Configuration ###
