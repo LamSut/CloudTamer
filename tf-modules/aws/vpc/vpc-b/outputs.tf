@@ -12,19 +12,14 @@ output "vpc_cidr" {
   value       = aws_vpc.vpc_b.cidr_block
 }
 
-output "public_subnet_1" {
-  description = "ID of the public subnet"
-  value       = aws_subnet.vpc_b_public_subnet_1.id
+output "public_subnet" {
+  description = "IDs of the public subnets"
+  value       = aws_subnet.vpc_b_public_subnet[*].id
 }
 
-output "private_subnet_1" {
-  description = "ID of the private subnet"
-  value       = aws_subnet.vpc_b_private_subnet_1.id
-}
-
-output "private_subnet_2" {
-  description = "ID of the private subnet"
-  value       = aws_subnet.vpc_b_private_subnet_2.id
+output "private_subnet" {
+  description = "IDs of the private subnets"
+  value       = aws_subnet.vpc_b_private_subnet[*].id
 }
 
 output "public_rt" {
@@ -34,8 +29,9 @@ output "public_rt" {
 
 output "private_rt" {
   description = "ID of the private route table"
-  value       = aws_route_table.vpc_b_private_rt.id
+  value       = aws_route_table.vpc_b_private_rt[*].id
 }
+
 
 ##################
 ### SG Outputs ###
