@@ -48,24 +48,46 @@ module "vpc_a" {
 ### Module ECR ###
 ##################
 
-resource "aws_ecr_repository" "frontend_repo" {
-  provider = aws.singapore
-  name     = "frontend"
-}
+module "ecr" {
+  source = "../../../tf-modules/aws/ecr"
+  providers = {
+    aws = aws.singapore
+  }
 
-resource "aws_ecr_repository" "backend_repo" {
-  provider = aws.singapore
-  name     = "backend"
+  ecr_repo_names   = var.ecr_repo_names
+  ecr_force_delete = var.ecr_force_delete
 }
 
 resource "null_resource" "get_docker_compose" {
-  depends_on = [
-    aws_ecr_repository.frontend_repo,
-    aws_ecr_repository.backend_repo
-  ]
+  depends_on = [module.ecr]
 
   provisioner "local-exec" {
-    command = "bash ../../../shared/docker-compose/get.sh"
+    command = var.get_docker_compose_command
   }
 }
 
+data "aws_caller_identity" "current" {}
+
+locals {
+  repo_pairs = [for i in range(length(var.ecr_repo_names)) : "${var.ecr_repo_names[i]}:${var.local_image_names[i]}"]
+}
+
+resource "null_resource" "push_ecr" {
+  depends_on = [
+    module.ecr,
+    null_resource.get_docker_compose
+  ]
+
+  triggers = {
+    image_names = join(",", var.local_image_names)
+    repo_pairs  = join(",", local.repo_pairs)
+  }
+
+  provisioner "local-exec" {
+    command = join(" ", concat([
+      "./push.sh",
+      data.aws_region.region_a.region,
+      data.aws_caller_identity.current.account_id
+    ], local.repo_pairs))
+  }
+}

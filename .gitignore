@@ -45,4 +45,4 @@ terraform.rc
 *.conf
 
 # Ignore cloned repositories
-/repo/
+repo/
