@@ -50,40 +50,15 @@ module "ecr" {
     aws = aws.singapore
   }
 
-  ecr_repo_names   = var.ecr_repo_names
+  ecr_repo_names   = var.docker_images
   ecr_force_delete = var.ecr_force_delete
 }
 
-resource "null_resource" "get_docker_compose" {
+resource "null_resource" "get_dockerfiles" {
   depends_on = [module.ecr]
 
   provisioner "local-exec" {
-    command = var.get_docker_compose_command
+    command = var.get_dockerfiles_command
   }
 }
 
-data "aws_caller_identity" "current" {}
-
-locals {
-  repo_pairs = [for i in range(length(var.ecr_repo_names)) : "${var.ecr_repo_names[i]}:${var.local_image_names[i]}"]
-}
-
-resource "null_resource" "push_ecr" {
-  depends_on = [
-    module.ecr,
-    null_resource.get_docker_compose
-  ]
-
-  triggers = {
-    image_names = join(",", var.local_image_names)
-    repo_pairs  = join(",", local.repo_pairs)
-  }
-
-  provisioner "local-exec" {
-    command = join(" ", concat([
-      "./push.sh",
-      data.aws_region.region_a.region,
-      data.aws_caller_identity.current.account_id
-    ], local.repo_pairs))
-  }
-}

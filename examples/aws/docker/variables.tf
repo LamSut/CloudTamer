@@ -22,16 +22,10 @@ variable "vpc_a_cidr" {
 ### ECR Configuration ###
 #########################
 
-variable "ecr_repo_names" {
-  description = "List of ECR repository names to create"
+variable "docker_images" {
+  description = "List of Docker images to be built and pushed to ECR"
   type        = list(string)
   default     = ["frontend", "backend"]
-}
-
-variable "local_image_names" {
-  description = "List of local Docker image names (must match docker-compose build)"
-  type        = list(string)
-  default     = ["frontend:v1", "backend:v1"]
 }
 
 variable "ecr_force_delete" {
@@ -40,8 +34,8 @@ variable "ecr_force_delete" {
   default     = true # Change to false to prevent accidental deletions
 }
 
-variable "get_docker_compose_command" {
+variable "get_dockerfiles_command" {
   description = "Command to get the docker-compose file"
   type        = string
-  default     = "bash ../../../shared/docker-compose/get.sh"
+  default     = "bash ../../../shared/docker/get.sh"
 }

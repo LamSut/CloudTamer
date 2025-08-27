@@ -12,12 +12,12 @@ output "vpc_cidr" {
   value       = aws_vpc.vpc_a.cidr_block
 }
 
-output "public_subnet" {
+output "public_subnets" {
   description = "IDs of the public subnets"
   value       = { for k, subnet in aws_subnet.vpc_a_public_subnet : k => subnet.id }
 }
 
-output "private_subnet" {
+output "private_subnets" {
   description = "IDs of the private subnets"
   value       = { for k, subnet in aws_subnet.vpc_a_private_subnet : k => subnet.id }
 }
@@ -27,7 +27,7 @@ output "public_rt" {
   value       = aws_route_table.vpc_a_public_rt.id
 }
 
-output "private_rt" {
+output "private_rts" {
   description = "IDs of the private route tables (per AZ)"
   value       = { for k, rt in aws_route_table.vpc_a_private_rt : k => rt.id }
 }
