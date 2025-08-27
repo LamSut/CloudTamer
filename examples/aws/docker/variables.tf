@@ -22,6 +22,23 @@ variable "vpc_a_cidr" {
 ### ECR Configuration ###
 #########################
 
+variable "ecr_force_delete" {
+  description = "Whether to force delete the ECR repositories"
+  type        = bool
+  default     = true # Change to false to prevent accidental deletions
+}
+
+
+############################
+### Docker Configuration ###
+############################
+
+variable "get_dockerfiles_command" {
+  description = "Command to get the docker-compose file"
+  type        = string
+  default     = "bash ../../../shared/docker/get.sh"
+}
+
 variable "docker_images" {
   description = "Map of services to be built with their context and tags"
 
@@ -33,7 +50,7 @@ variable "docker_images" {
   default = {
     frontend = {
       context = "./repo/frontend"
-      tag     = "v2"
+      tag     = "v1"
     }
     backend = {
       context = "./repo/backend-api"
@@ -42,14 +59,19 @@ variable "docker_images" {
   }
 }
 
-variable "ecr_force_delete" {
-  description = "Whether to force delete the ECR repositories"
-  type        = bool
-  default     = true # Change to false to prevent accidental deletions
+
+#########################
+### ECS Configuration ###
+#########################
+
+variable "cluster_name" {
+  description = "Name of the ECS cluster"
+  type        = string
+  default     = "pizza-cluster"
 }
 
-variable "get_dockerfiles_command" {
-  description = "Command to get the docker-compose file"
+variable "task_family" {
+  description = "Family name for the ECS task definition"
   type        = string
-  default     = "bash ../../../shared/docker/get.sh"
+  default     = "pizza-task"
 }

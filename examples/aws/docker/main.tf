@@ -29,24 +29,24 @@ data "aws_region" "region_a" {
 ### Module VPC A ###
 ####################
 
-# data "aws_availability_zones" "region_a_azs" {
-#   provider = aws.singapore
-#   state    = "available"
-# }
+data "aws_availability_zones" "region_a_azs" {
+  provider = aws.singapore
+  state    = "available"
+}
 
-# module "vpc_a" {
-#   source = "../../../tf-modules/aws/vpc/vpc-a"
-#   providers = {
-#     aws = aws.singapore
-#   }
+module "vpc_a" {
+  source = "../../../tf-modules/aws/vpc/vpc-a"
+  providers = {
+    aws = aws.singapore
+  }
 
-#   default_cidr   = var.default_cidr
-#   vpc_a_dst_cidr = var.vpc_a_cidr
+  default_cidr   = var.default_cidr
+  vpc_a_dst_cidr = var.vpc_a_cidr
 
-#   vpc_a_cidr                = var.vpc_a_cidr
-#   vpc_a_availability_zone_1 = data.aws_availability_zones.region_a_azs.names[0]
-#   vpc_a_availability_zone_2 = data.aws_availability_zones.region_a_azs.names[1]
-# }
+  vpc_a_cidr                = var.vpc_a_cidr
+  vpc_a_availability_zone_1 = data.aws_availability_zones.region_a_azs.names[0]
+  vpc_a_availability_zone_2 = data.aws_availability_zones.region_a_azs.names[1]
+}
 
 
 ##################
@@ -95,3 +95,36 @@ module "docker" {
 
   depends_on = [null_resource.get_dockerfiles]
 }
+
+
+##################
+### Module ECS ###
+##################
+
+data "aws_iam_role" "ecs_task_execution" {
+  name = "ecsTaskExecutionRole"
+}
+
+module "ecs" {
+  source = "../../../tf-modules/aws/ecs"
+  providers = {
+    aws = aws.singapore
+  }
+
+  cluster_name       = var.cluster_name
+  task_family        = var.task_family
+  execution_role_arn = data.aws_iam_role.ecs_task_execution.arn
+  task_role_arn      = data.aws_iam_role.ecs_task_execution.arn
+  container_definitions = templatefile("${path.module}/container_definitions.json", {
+    frontend_image = module.docker.image_urls["frontend"]
+    backend_image  = module.docker.image_urls["backend"]
+    mysql_image    = "mysql:8.0"
+    redis_image    = "redis:7.0"
+  })
+
+  subnet_ids = values(module.vpc_a.public_subnets)
+  security_group_ids = [
+    module.vpc_a.sg_http,
+  ]
+}
+

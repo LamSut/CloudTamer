@@ -1,0 +1,104 @@
+[
+    {
+        "name": "frontend",
+        "image": "${frontend_image}",
+        "portMappings": [
+            {
+                "containerPort": 5173,
+                "hostPort": 5173,
+                "protocol": "tcp"
+            }
+        ],
+        "environment": [
+            {
+                "name": "VITE_TARGET",
+                "value": "http://backend:3000/"
+            }
+        ],
+        "essential": true
+    },
+    {
+        "name": "backend",
+        "image": "${backend_image}",
+        "portMappings": [
+            {
+                "containerPort": 3000,
+                "hostPort": 3000,
+                "protocol": "tcp"
+            }
+        ],
+        "environment": [
+            {
+                "name": "DB_HOST",
+                "value": "mysql"
+            },
+            {
+                "name": "DB_PORT",
+                "value": "3306"
+            },
+            {
+                "name": "DB_USER",
+                "value": "root"
+            },
+            {
+                "name": "DB_PASS",
+                "value": "1"
+            },
+            {
+                "name": "DB_NAME",
+                "value": "pizza"
+            },
+            {
+                "name": "REDIS_HOST",
+                "value": "redis"
+            },
+            {
+                "name": "REDIS_PORT",
+                "value": "6379"
+            },
+            {
+                "name": "SWAGGER_HOST",
+                "value": "backend"
+            },
+            {
+                "name": "SWAGGER_PORT",
+                "value": "3000"
+            }
+        ],
+        "essential": true
+    },
+    {
+        "name": "mysql",
+        "image": "${mysql_image}",
+        "portMappings": [
+            {
+                "containerPort": 3306,
+                "hostPort": 3306,
+                "protocol": "tcp"
+            }
+        ],
+        "environment": [
+            {
+                "name": "MYSQL_ROOT_PASSWORD",
+                "value": "1"
+            },
+            {
+                "name": "MYSQL_DATABASE",
+                "value": "pizza"
+            }
+        ],
+        "essential": true
+    },
+    {
+        "name": "redis",
+        "image": "${redis_image}",
+        "portMappings": [
+            {
+                "containerPort": 6379,
+                "hostPort": 6379,
+                "protocol": "tcp"
+            }
+        ],
+        "essential": true
+    }
+]
