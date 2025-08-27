@@ -37,7 +37,7 @@ fi
 # Destroying the infrastructure with Terraform
 echo "Destroying infrastructure..."
 if [[ -f "$TFVARS_FILE" ]]; then
-  terraform destroy -var-file="$TFVARS_FILE"
+  terraform destroy -var-file="$TFVARS_FILE" --auto-approve
 else
   terraform destroy
 fi

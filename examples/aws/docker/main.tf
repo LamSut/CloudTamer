@@ -2,6 +2,19 @@
 ### Terraform Configuration ###
 ###############################
 
+terraform {
+  required_providers {
+    aws = {
+      source = "hashicorp/aws"
+    }
+    docker = {
+      source  = "kreuzwerker/docker"
+      version = "3.6.2"
+    }
+  }
+  backend "s3" {}
+}
+
 provider "aws" {
   alias  = "singapore"
   region = "ap-southeast-1"
@@ -11,38 +24,38 @@ data "aws_region" "region_a" {
   provider = aws.singapore
 }
 
-terraform {
-  backend "s3" {}
-}
-
 
 ####################
 ### Module VPC A ###
 ####################
 
-data "aws_availability_zones" "region_a_azs" {
-  provider = aws.singapore
-  state    = "available"
-}
+# data "aws_availability_zones" "region_a_azs" {
+#   provider = aws.singapore
+#   state    = "available"
+# }
 
-module "vpc_a" {
-  source = "../../../tf-modules/aws/vpc/vpc-a"
-  providers = {
-    aws = aws.singapore
-  }
+# module "vpc_a" {
+#   source = "../../../tf-modules/aws/vpc/vpc-a"
+#   providers = {
+#     aws = aws.singapore
+#   }
 
-  default_cidr   = var.default_cidr
-  vpc_a_dst_cidr = var.vpc_a_cidr
+#   default_cidr   = var.default_cidr
+#   vpc_a_dst_cidr = var.vpc_a_cidr
 
-  vpc_a_cidr                = var.vpc_a_cidr
-  vpc_a_availability_zone_1 = data.aws_availability_zones.region_a_azs.names[0]
-  vpc_a_availability_zone_2 = data.aws_availability_zones.region_a_azs.names[1]
-}
+#   vpc_a_cidr                = var.vpc_a_cidr
+#   vpc_a_availability_zone_1 = data.aws_availability_zones.region_a_azs.names[0]
+#   vpc_a_availability_zone_2 = data.aws_availability_zones.region_a_azs.names[1]
+# }
 
 
 ##################
 ### Module ECR ###
 ##################
+
+data "aws_ecr_authorization_token" "token" {
+  provider = aws.singapore
+}
 
 module "ecr" {
   source = "../../../tf-modules/aws/ecr"
@@ -50,15 +63,35 @@ module "ecr" {
     aws = aws.singapore
   }
 
-  ecr_repo_names   = var.docker_images
+  ecr_repo_names   = keys(var.docker_images)
   ecr_force_delete = var.ecr_force_delete
 }
 
-resource "null_resource" "get_dockerfiles" {
-  depends_on = [module.ecr]
+#####################
+### Module Docker ###
+#####################
 
-  provisioner "local-exec" {
-    command = var.get_dockerfiles_command
+provider "docker" {
+  registry_auth {
+    address  = data.aws_ecr_authorization_token.token.proxy_endpoint
+    username = data.aws_ecr_authorization_token.token.user_name
+    password = data.aws_ecr_authorization_token.token.password
   }
 }
 
+resource "null_resource" "get_dockerfiles" {
+  provisioner "local-exec" {
+    command = var.get_dockerfiles_command
+  }
+
+  depends_on = [module.ecr]
+}
+
+module "docker" {
+  source = "../../../tf-modules/others/docker"
+
+  docker_images = var.docker_images
+  repo_urls     = module.ecr.repo_urls
+
+  depends_on = [null_resource.get_dockerfiles]
+}

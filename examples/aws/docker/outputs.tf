@@ -1,4 +1,5 @@
-output "ecr_repo_uris" {
-  description = "ECR Repository URI"
-  value       = module.ecr.ecr_rpo_uris
+output "images_urls" {
+  description = "Docker Image URLs"
+  value       = module.docker.image_urls
 }
+

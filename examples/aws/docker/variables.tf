@@ -23,9 +23,23 @@ variable "vpc_a_cidr" {
 #########################
 
 variable "docker_images" {
-  description = "List of Docker images to be built and pushed to ECR"
-  type        = list(string)
-  default     = ["frontend", "backend"]
+  description = "Map of services to be built with their context and tags"
+
+  type = map(object({
+    context = string
+    tag     = string
+  }))
+
+  default = {
+    frontend = {
+      context = "./repo/frontend"
+      tag     = "v2"
+    }
+    backend = {
+      context = "./repo/backend-api"
+      tag     = "v1"
+    }
+  }
 }
 
 variable "ecr_force_delete" {

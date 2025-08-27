@@ -46,7 +46,7 @@ fi
 # Provisioning the infrastructure with Terraform
 echo "Applying terraform plan..."
 if [[ -f "$TFVARS_FILE" ]]; then
-  terraform apply -var-file="$TFVARS_FILE"
+  terraform apply -var-file="$TFVARS_FILE" --auto-approve
 else
   terraform apply
 fi
