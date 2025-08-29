@@ -7,6 +7,51 @@ terraform {
 }
 
 
+##################
+### Networking ###
+##################
+
+resource "aws_security_group" "vpc_sg_ecs_fe" {
+  name        = "sg_ecs_fe"
+  description = "ECS FE allow access from ALB"
+  vpc_id      = var.vpc
+
+  ingress {
+    from_port       = var.fe_port
+    to_port         = var.fe_port
+    protocol        = "tcp"
+    security_groups = [var.sg_http]
+  }
+
+  egress {
+    from_port   = 0
+    to_port     = 0
+    protocol    = "-1"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+}
+
+resource "aws_security_group" "vpc_sg_ecs_be" {
+  name        = "sg_ecs_be"
+  description = "ECS BE allow access from ALB"
+  vpc_id      = var.vpc
+
+  ingress {
+    from_port       = var.be_port
+    to_port         = var.be_port
+    protocol        = "tcp"
+    security_groups = [var.sg_http]
+  }
+
+  egress {
+    from_port   = 0
+    to_port     = 0
+    protocol    = "-1"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+}
+
+
 ###################
 ### ECS Cluster ###
 ###################
@@ -55,9 +100,15 @@ resource "aws_ecs_service" "fe_service" {
   desired_count   = var.fe_count
 
   network_configuration {
-    subnets          = var.subnet_ids
-    security_groups  = var.security_group_ids
+    subnets          = var.public_subnet_ids
+    security_groups  = [aws_security_group.vpc_sg_ecs_fe.id]
     assign_public_ip = true
+  }
+
+  load_balancer {
+    target_group_arn = var.fe_tg_arn
+    container_name   = "frontend"
+    container_port   = var.fe_port
   }
 }
 
@@ -69,8 +120,15 @@ resource "aws_ecs_service" "be_service" {
   desired_count   = var.be_count
 
   network_configuration {
-    subnets          = var.subnet_ids
-    security_groups  = var.security_group_ids
+    subnets          = var.private_subnet_ids
+    security_groups  = [aws_security_group.vpc_sg_ecs_be.id]
     assign_public_ip = true
   }
+
+  load_balancer {
+    target_group_arn = var.be_tg_arn
+    container_name   = "backend"
+    container_port   = var.be_port
+  }
 }
+

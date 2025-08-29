@@ -34,7 +34,7 @@ data "aws_availability_zones" "region_a_azs" {
   state    = "available"
 }
 
-module "vpc_a" {
+module "vpc" {
   source = "../../../tf-modules/aws/vpc/vpc-a"
   providers = {
     aws = aws.singapore
@@ -67,6 +67,7 @@ module "ecr" {
   ecr_force_delete = var.ecr_force_delete
 }
 
+
 #####################
 ### Module Docker ###
 #####################
@@ -98,6 +99,24 @@ module "docker" {
 
 
 ##################
+### Module ALB ###
+##################
+
+module "alb" {
+  source = "../../../tf-modules/aws/alb"
+  providers = {
+    aws = aws.singapore
+  }
+
+  vpc                = module.vpc.vpc
+  public_subnet_ids  = values(module.vpc.public_subnets)
+  private_subnet_ids = values(module.vpc.private_subnets)
+  sg_http            = module.vpc.sg_http
+  cluster_name       = var.cluster_name
+}
+
+
+##################
 ### Module ECS ###
 ##################
 
@@ -116,23 +135,31 @@ module "ecs" {
   execution_role_arn = data.aws_iam_role.ecs_task_execution.arn
   task_role_arn      = data.aws_iam_role.ecs_task_execution.arn
 
-  subnet_ids = values(module.vpc_a.public_subnets)
-  security_group_ids = [
-    module.vpc_a.sg_http,
-  ]
+  vpc                = module.vpc.vpc
+  public_subnet_ids  = values(module.vpc.public_subnets)
+  private_subnet_ids = values(module.vpc.private_subnets)
+  sg_http            = module.vpc.sg_http
+
+  fe_port = var.fe_port
+  be_port = var.be_port
 
   fe_container_definitions = templatefile("${path.module}/fe_container_definitions.json", {
     frontend_image = module.docker.image_urls["frontend"]
-    backend_url    = "nilhil"
+    backend_url    = "http://${module.alb.alb_dns_name}/api"
   })
 
   be_container_definitions = templatefile("${path.module}/be_container_definitions.json", {
     backend_image = module.docker.image_urls["backend"]
     db_host       = "nilhil"
     cache_host    = "nilhil"
-    backend_host  = "nilhil"
+    backend_host  = module.alb.alb_dns_name
   })
+
+  fe_tg_arn = module.alb.fe_tg_arn
+  be_tg_arn = module.alb.be_tg_arn
 
   fe_count = var.fe_count
   be_count = var.be_count
+
+  depends_on = [module.alb]
 }

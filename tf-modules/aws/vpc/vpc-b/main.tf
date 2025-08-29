@@ -199,7 +199,7 @@ resource "aws_security_group" "vpc_b_sg_rds_ec2" {
     from_port       = 3306
     to_port         = 3306
     protocol        = "tcp"
-    security_groups = [aws_security_group.vpc_b_sg_ssh.id, aws_security_group.vpc_b_sg_rdp.id]
+    security_groups = [aws_security_group.vpc_b_sg_http.id, aws_security_group.vpc_b_sg_ssh.id, aws_security_group.vpc_b_sg_rdp.id]
   }
 
   ingress {
@@ -213,7 +213,7 @@ resource "aws_security_group" "vpc_b_sg_rds_ec2" {
     from_port       = 5432
     to_port         = 5432
     protocol        = "tcp"
-    security_groups = [aws_security_group.vpc_b_sg_ssh.id, aws_security_group.vpc_b_sg_rdp.id]
+    security_groups = [aws_security_group.vpc_b_sg_http.id, aws_security_group.vpc_b_sg_ssh.id, aws_security_group.vpc_b_sg_rdp.id]
   }
 
   ingress {

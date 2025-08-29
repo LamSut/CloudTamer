@@ -76,6 +76,18 @@ variable "task_family" {
   default     = "pizza-task"
 }
 
+variable "fe_port" {
+  description = "Port for the Frontend container"
+  type        = number
+  default     = 5173
+}
+
+variable "be_port" {
+  description = "Port for the Backend container"
+  type        = number
+  default     = 3000
+}
+
 variable "fe_count" {
   description = "Number of Frontend service instances"
   type        = number
