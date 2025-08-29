@@ -118,8 +118,9 @@ module "ecs" {
   container_definitions = templatefile("${path.module}/container_definitions.json", {
     frontend_image = module.docker.image_urls["frontend"]
     backend_image  = module.docker.image_urls["backend"]
-    mysql_image    = "mysql:8.0"
-    redis_image    = "redis:7.0"
+    db_host        = "nilhil"
+    cache_host     = "nilhil"
+    task_host      = "nilhil"
   })
 
   subnet_ids = values(module.vpc_a.public_subnets)
@@ -127,4 +128,3 @@ module "ecs" {
     module.vpc_a.sg_http,
   ]
 }
-

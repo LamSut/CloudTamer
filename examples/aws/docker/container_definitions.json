@@ -11,8 +11,12 @@
         ],
         "environment": [
             {
+                "name": "NODE_ENV",
+                "value": "development"
+            },
+            {
                 "name": "VITE_TARGET",
-                "value": "http://backend:3000/"
+                "value": "http://localhost:3000/"
             }
         ],
         "essential": true
@@ -30,7 +34,7 @@
         "environment": [
             {
                 "name": "DB_HOST",
-                "value": "mysql"
+                "value": "${db_host}"
             },
             {
                 "name": "DB_PORT",
@@ -50,7 +54,7 @@
             },
             {
                 "name": "REDIS_HOST",
-                "value": "redis"
+                "value": "${cache_host}"
             },
             {
                 "name": "REDIS_PORT",
@@ -58,45 +62,11 @@
             },
             {
                 "name": "SWAGGER_HOST",
-                "value": "backend"
+                "value": "${task_host}"
             },
             {
                 "name": "SWAGGER_PORT",
                 "value": "3000"
-            }
-        ],
-        "essential": true
-    },
-    {
-        "name": "mysql",
-        "image": "${mysql_image}",
-        "portMappings": [
-            {
-                "containerPort": 3306,
-                "hostPort": 3306,
-                "protocol": "tcp"
-            }
-        ],
-        "environment": [
-            {
-                "name": "MYSQL_ROOT_PASSWORD",
-                "value": "1"
-            },
-            {
-                "name": "MYSQL_DATABASE",
-                "value": "pizza"
-            }
-        ],
-        "essential": true
-    },
-    {
-        "name": "redis",
-        "image": "${redis_image}",
-        "portMappings": [
-            {
-                "containerPort": 6379,
-                "hostPort": 6379,
-                "protocol": "tcp"
             }
         ],
         "essential": true
