@@ -115,16 +115,24 @@ module "ecs" {
   task_family        = var.task_family
   execution_role_arn = data.aws_iam_role.ecs_task_execution.arn
   task_role_arn      = data.aws_iam_role.ecs_task_execution.arn
-  container_definitions = templatefile("${path.module}/container_definitions.json", {
-    frontend_image = module.docker.image_urls["frontend"]
-    backend_image  = module.docker.image_urls["backend"]
-    db_host        = "nilhil"
-    cache_host     = "nilhil"
-    task_host      = "nilhil"
-  })
 
   subnet_ids = values(module.vpc_a.public_subnets)
   security_group_ids = [
     module.vpc_a.sg_http,
   ]
+
+  fe_container_definitions = templatefile("${path.module}/fe_container_definitions.json", {
+    frontend_image = module.docker.image_urls["frontend"]
+    backend_url    = "nilhil"
+  })
+
+  be_container_definitions = templatefile("${path.module}/be_container_definitions.json", {
+    backend_image = module.docker.image_urls["backend"]
+    db_host       = "nilhil"
+    cache_host    = "nilhil"
+    backend_host  = "nilhil"
+  })
+
+  fe_count = var.fe_count
+  be_count = var.be_count
 }

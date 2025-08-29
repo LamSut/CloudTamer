@@ -1,27 +1,5 @@
 [
     {
-        "name": "frontend",
-        "image": "${frontend_image}",
-        "portMappings": [
-            {
-                "containerPort": 5173,
-                "hostPort": 5173,
-                "protocol": "tcp"
-            }
-        ],
-        "environment": [
-            {
-                "name": "NODE_ENV",
-                "value": "development"
-            },
-            {
-                "name": "VITE_TARGET",
-                "value": "http://localhost:3000/"
-            }
-        ],
-        "essential": true
-    },
-    {
         "name": "backend",
         "image": "${backend_image}",
         "portMappings": [
@@ -62,7 +40,7 @@
             },
             {
                 "name": "SWAGGER_HOST",
-                "value": "${task_host}"
+                "value": "${backend_host}"
             },
             {
                 "name": "SWAGGER_PORT",

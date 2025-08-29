@@ -75,3 +75,15 @@ variable "task_family" {
   type        = string
   default     = "pizza-task"
 }
+
+variable "fe_count" {
+  description = "Number of Frontend service instances"
+  type        = number
+  default     = 2
+}
+
+variable "be_count" {
+  description = "Number of Backend service instances"
+  type        = number
+  default     = 3
+}

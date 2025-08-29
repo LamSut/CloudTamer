@@ -1,0 +1,24 @@
+[
+    {
+        "name": "frontend",
+        "image": "${frontend_image}",
+        "portMappings": [
+            {
+                "containerPort": 5173,
+                "hostPort": 5173,
+                "protocol": "tcp"
+            }
+        ],
+        "environment": [
+            {
+                "name": "NODE_ENV",
+                "value": "development"
+            },
+            {
+                "name": "VITE_TARGET",
+                "value": "${backend_url}"
+            }
+        ],
+        "essential": true
+    }
+]
