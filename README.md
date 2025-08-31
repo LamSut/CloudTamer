@@ -10,9 +10,9 @@ A reusable Terraform boilerplate for provisioning infrastructure on AWS, Azure a
 ## Usage
 * Provision the cloud infrastructure using Terraform:
 ```bash
-$ ./provision <cloud provider> <project> <environment>  # For example: ./provision aws vm-db dev 
+$ ./provision.sh <cloud provider> <project> <environment>  # For example: ./provision aws vm-db dev 
 ```
 * Tear down infrastructure using Terraform:
 ```bash
-$ ./destroy <cloud provider> <project> <environment>  # For example: ./destroy aws vm-db dev 
+$ ./destroy.sh <cloud provider> <project> <environment>  # For example: ./destroy aws vm-db dev 
 ```
