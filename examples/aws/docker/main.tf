@@ -128,13 +128,30 @@ data "aws_iam_role" "ecs_task_execution" {
   name = "ecsTaskExecutionRole"
 }
 
-module "ecs" {
-  source = "../../../tf-modules/aws/ecs"
+module "ecs_network" {
+  source = "../../../tf-modules/aws/ecs/network"
   providers = {
     aws = aws.singapore
   }
 
-  cluster_name       = var.cluster_name
+  cluster_name = var.cluster_name
+
+  vpc     = module.vpc.vpc
+  sg_http = module.vpc.sg_http
+
+  fe_port = var.fe_port
+  be_port = var.be_port
+
+  depends_on = [module.vpc]
+}
+
+module "ecs_be" {
+  source = "../../../tf-modules/aws/ecs/be"
+  providers = {
+    aws = aws.singapore
+  }
+
+  cluster            = module.ecs_network.cluster
   task_family        = var.task_family
   execution_role_arn = data.aws_iam_role.ecs_task_execution.arn
   task_role_arn      = data.aws_iam_role.ecs_task_execution.arn
@@ -142,26 +159,49 @@ module "ecs" {
   vpc                = module.vpc.vpc
   private_subnet_ids = values(module.vpc.private_subnets)
   sg_http            = module.vpc.sg_http
+  sg_be              = module.ecs_network.sg_be
 
-  fe_port = var.fe_port
-  be_port = var.be_port
-
-  fe_container_definitions = templatefile("${path.module}/fe_container_definitions.json", {
-    frontend_image = module.docker.image_urls["frontend"]
-    backend_url    = "http://localhost:${var.be_port}"
-  })
+  be_count = var.be_count
+  be_port  = var.be_port
 
   be_container_definitions = templatefile("${path.module}/be_container_definitions.json", {
     backend_image = module.docker.image_urls["backend"]
     db_host       = "nilhil"
     cache_host    = "nilhil"
     backend_host  = "localhost"
+    task_family   = var.task_family
+    region        = data.aws_region.region_a.name
   })
 
+  depends_on = [module.alb]
+}
+
+module "ecs_fe" {
+  source = "../../../tf-modules/aws/ecs/fe"
+  providers = {
+    aws = aws.singapore
+  }
+
+  cluster            = module.ecs_network.cluster
+  task_family        = var.task_family
+  execution_role_arn = data.aws_iam_role.ecs_task_execution.arn
+  task_role_arn      = data.aws_iam_role.ecs_task_execution.arn
+
+  vpc                = module.vpc.vpc
+  private_subnet_ids = values(module.vpc.private_subnets)
+  sg_http            = module.vpc.sg_http
+  sg_fe              = module.ecs_network.sg_fe
+
+  fe_count  = var.fe_count
+  fe_port   = var.fe_port
   fe_tg_arn = module.alb.fe_tg_arn
 
-  fe_count = var.fe_count
-  be_count = var.be_count
+  fe_container_definitions = templatefile("${path.module}/fe_container_definitions.json", {
+    frontend_image = module.docker.image_urls["frontend"]
+    backend_url    = module.ecs_be.be_service_dns
+    task_family    = var.task_family
+    region         = data.aws_region.region_a.name
+  })
 
-  depends_on = [module.alb]
+  depends_on = [module.ecs_be]
 }

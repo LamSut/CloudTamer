@@ -73,7 +73,7 @@ variable "cluster_name" {
 variable "task_family" {
   description = "Family name for the ECS task definition"
   type        = string
-  default     = "pizza-task"
+  default     = "pizza-app"
 }
 
 variable "fe_port" {
