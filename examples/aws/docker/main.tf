@@ -170,7 +170,7 @@ module "ecs_be" {
     cache_host    = "nilhil"
     backend_host  = "localhost"
     task_family   = var.task_family
-    region        = data.aws_region.region_a.name
+    region        = data.aws_region.region_a.region
   })
 
   depends_on = [module.alb]
@@ -200,7 +200,7 @@ module "ecs_fe" {
     frontend_image = module.docker.image_urls["frontend"]
     backend_url    = module.ecs_be.be_service_dns
     task_family    = var.task_family
-    region         = data.aws_region.region_a.name
+    region         = data.aws_region.region_a.region
   })
 
   depends_on = [module.ecs_be]
