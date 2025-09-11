@@ -40,7 +40,7 @@ resource "aws_security_group" "vpc_sg_ecs_be" {
     from_port       = var.be_port
     to_port         = var.be_port
     protocol        = "tcp"
-    security_groups = [var.sg_http]
+    security_groups = [aws_security_group.vpc_sg_ecs_fe.id]
   }
 
   egress {
@@ -100,7 +100,7 @@ resource "aws_ecs_service" "fe_service" {
   desired_count   = var.fe_count
 
   network_configuration {
-    subnets          = var.public_subnet_ids
+    subnets          = var.private_subnet_ids
     security_groups  = [aws_security_group.vpc_sg_ecs_fe.id]
     assign_public_ip = true
   }
@@ -123,12 +123,6 @@ resource "aws_ecs_service" "be_service" {
     subnets          = var.private_subnet_ids
     security_groups  = [aws_security_group.vpc_sg_ecs_be.id]
     assign_public_ip = true
-  }
-
-  load_balancer {
-    target_group_arn = var.be_tg_arn
-    container_name   = "backend"
-    container_port   = var.be_port
   }
 }
 

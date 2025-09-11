@@ -5,7 +5,8 @@
 terraform {
   required_providers {
     aws = {
-      source = "hashicorp/aws"
+      source  = "hashicorp/aws"
+      version = "6.10.0"
     }
     docker = {
       source  = "kreuzwerker/docker"
@@ -35,17 +36,18 @@ data "aws_availability_zones" "region_a_azs" {
 }
 
 module "vpc" {
-  source = "../../../tf-modules/aws/vpc/vpc-a"
+  source = "../../../tf-modules/aws/vpc/vpc-c"
   providers = {
     aws = aws.singapore
   }
 
   default_cidr   = var.default_cidr
-  vpc_a_dst_cidr = var.vpc_a_cidr
+  vpc_c_dst_cidr = var.vpc_c_cidr
 
-  vpc_a_cidr                = var.vpc_a_cidr
-  vpc_a_availability_zone_1 = data.aws_availability_zones.region_a_azs.names[0]
-  vpc_a_availability_zone_2 = data.aws_availability_zones.region_a_azs.names[1]
+  vpc_c_cidr                = var.vpc_c_cidr
+  vpc_c_availability_zone_1 = data.aws_availability_zones.region_a_azs.names[0]
+  vpc_c_availability_zone_2 = data.aws_availability_zones.region_a_azs.names[1]
+  vpc_c_availability_zone_3 = data.aws_availability_zones.region_a_azs.names[2]
 }
 
 
@@ -113,6 +115,8 @@ module "alb" {
   private_subnet_ids = values(module.vpc.private_subnets)
   sg_http            = module.vpc.sg_http
   cluster_name       = var.cluster_name
+
+  fe_port = var.fe_port
 }
 
 
@@ -136,7 +140,6 @@ module "ecs" {
   task_role_arn      = data.aws_iam_role.ecs_task_execution.arn
 
   vpc                = module.vpc.vpc
-  public_subnet_ids  = values(module.vpc.public_subnets)
   private_subnet_ids = values(module.vpc.private_subnets)
   sg_http            = module.vpc.sg_http
 
@@ -145,18 +148,17 @@ module "ecs" {
 
   fe_container_definitions = templatefile("${path.module}/fe_container_definitions.json", {
     frontend_image = module.docker.image_urls["frontend"]
-    backend_url    = "http://${module.alb.alb_dns_name}/api"
+    backend_url    = "http://localhost:${var.be_port}"
   })
 
   be_container_definitions = templatefile("${path.module}/be_container_definitions.json", {
     backend_image = module.docker.image_urls["backend"]
     db_host       = "nilhil"
     cache_host    = "nilhil"
-    backend_host  = module.alb.alb_dns_name
+    backend_host  = "localhost"
   })
 
   fe_tg_arn = module.alb.fe_tg_arn
-  be_tg_arn = module.alb.be_tg_arn
 
   fe_count = var.fe_count
   be_count = var.be_count
